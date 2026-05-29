@@ -1,4 +1,5 @@
 #include "../include/http.hpp"
+#include "../include/const.hpp"
 #include "../include/socket.hpp"
 
 namespace nomos::http
@@ -8,7 +9,7 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   if (raw_http.empty())
     return std::nullopt;
 
-  size_t line_end = raw_http.find(HTTP_END);
+  size_t line_end = raw_http.find(consts::HTTP_END);
   if (line_end == std::string_view::npos)
     return std::nullopt;
 
