@@ -1,7 +1,6 @@
-#include "nomos.hpp"
-#include "http.hpp"
-#include "socket.hpp"
-#include <print>
+#include "../include/nomos.hpp"
+#include "../include/http.hpp"
+#include "../include/socket.hpp"
 
 namespace nomos
 {

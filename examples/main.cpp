@@ -1,4 +1,4 @@
-#include "nomos.hpp"
+#include "../include/nomos.hpp"
 #include <print>
 
 int main(void)
