@@ -1,3 +1,4 @@
+#include "../include/http.hpp"
 #include "../include/nomos.hpp"
 #include <print>
 
@@ -5,7 +6,7 @@ int main(void)
 {
   nomos::App app;
 
-  app.get("/", [](auto req, auto res)
+  app.get("/", [](const auto &req, const auto &res)
           {
             res.send("Hello World!");
           });

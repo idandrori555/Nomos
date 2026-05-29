@@ -1,5 +1,6 @@
 #pragma once
 
+#include "const.hpp"
 #include "types.hpp"
 #include <expected>
 #include <string>
@@ -15,12 +16,9 @@ enum class SocketError
   ListenFailed,
 };
 
-constexpr int MAX_CHUNK_SIZE = 4096;
-constexpr socket_t INVALID_SOCKET = -1;
-
 struct SocketEngine
 {
-  socket_t server_fd{INVALID_SOCKET};
+  socket_t server_fd{consts::INVALID_SOCKET};
 
   // init bind and listen
   std::expected<void, SocketError> listen(port_t port) noexcept;

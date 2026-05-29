@@ -23,7 +23,7 @@ std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
   }
 #endif
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (server_fd == INVALID_SOCKET)
+  if (server_fd == consts::INVALID_SOCKET)
     return std::unexpected(SocketError::CreateFailed);
 
   sockaddr_in addr{};
@@ -58,7 +58,7 @@ socket_t SocketEngine::accept_connection(void) noexcept
 // read request
 std::string SocketEngine::read_request(socket_t client_fd) const noexcept
 {
-  std::array<char, MAX_CHUNK_SIZE> buffer{};
+  std::array<char, consts::MAX_CHUNK_SIZE> buffer{};
 #if NOMOS_IS_WINDOWS
   long bytes_read = recv(client_fd, buffer.data(), static_cast<int>(buffer.size() - 1), 0);
 #else
@@ -83,7 +83,7 @@ void SocketEngine::send_response(socket_t client_fd, std::string_view response) 
 // close socket
 void SocketEngine::close_connection(socket_t fd) noexcept
 {
-  if (fd != INVALID_SOCKET)
+  if (fd != consts::INVALID_SOCKET)
   {
 #if NOMOS_IS_WINDOWS
     closesocket(fd);

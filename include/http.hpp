@@ -20,7 +20,7 @@ private:
   nomos::types::socket_t m_client_fd;
 
 public:
-  explicit Response(int client_fd) noexcept : m_client_fd(client_fd)
+  explicit Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd)
   {
   }
 

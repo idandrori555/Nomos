@@ -19,7 +19,7 @@ void App::listen(port_t port, NomosListenCallback callback)
   while (true)
   {
     socket_t client_fd = engine.accept_connection();
-    if (client_fd == internal::INVALID_SOCKET)
+    if (client_fd == consts::INVALID_SOCKET)
       continue;
 
     std::string raw_request = engine.read_request(client_fd);
