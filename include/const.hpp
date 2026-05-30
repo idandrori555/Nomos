@@ -11,9 +11,5 @@ constexpr const char *HTTP_METHOD_ALL = "ALL";
 
 constexpr int MAX_CHUNK_SIZE = 4096;
 
-#if NOMOS_IS_WINDOWS == 1
 constexpr const types::socket_t INVALID_SOCKET = -1;
-#else
-constexpr const types::socket_t INVALID_SOCKET = -1;
-#endif
 } // namespace nomos::consts
