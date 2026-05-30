@@ -1,16 +1,29 @@
-#include "socket.hpp"
-#include <array>
+#include "../include/socket.hpp"
+
+#if NOMOS_IS_WINDOWS == 1
+#include <winsock2.h>
+#else
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#endif
+
+#include <array>
 
 namespace nomos::internal
 {
 // init bind and listen
 std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
 {
+#if NOMOS_IS_WINDOWS == 1
+  WSADATA wsa_data;
+  if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
+  {
+    return std::unexpected(SocketError::CreateFailed);
+  }
+#endif
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (server_fd < 0)
+  if (server_fd == consts::INVALID_SOCKET)
     return std::unexpected(SocketError::CreateFailed);
 
   sockaddr_in addr{};
@@ -19,7 +32,10 @@ std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
   addr.sin_port = htons(port);
 
   if (bind(server_fd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) < 0)
+  {
+    close_connection(server_fd);
     return std::unexpected(SocketError::BindFailed);
+  }
 
   if (::listen(server_fd, SOMAXCONN) < 0)
     return std::unexpected(SocketError::ListenFailed);
@@ -28,18 +44,26 @@ std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
 };
 
 // accept connection
-int SocketEngine::accept_connection(void) noexcept
+socket_t SocketEngine::accept_connection(void) noexcept
 {
   sockaddr_in client_addr{};
+#if NOMOS_IS_WINDOWS
+  int client_addr_len = sizeof(client_addr);
+#else
   socklen_t client_addr_len = sizeof(client_addr);
+#endif
   return accept(server_fd, reinterpret_cast<struct sockaddr *>(&client_addr), &client_addr_len);
 };
 
 // read request
-std::string SocketEngine::read_request(int client_fd) const noexcept
+std::string SocketEngine::read_request(socket_t client_fd) const noexcept
 {
-  std::array<char, MAX_CHUNK_SIZE> buffer{};
+  std::array<char, consts::MAX_CHUNK_SIZE> buffer{};
+#if NOMOS_IS_WINDOWS
+  long bytes_read = recv(client_fd, buffer.data(), static_cast<int>(buffer.size() - 1), 0);
+#else
   long bytes_read = read(client_fd, buffer.data(), buffer.size() - 1);
+#endif
   if (bytes_read <= 0)
     return "";
 
@@ -47,15 +71,25 @@ std::string SocketEngine::read_request(int client_fd) const noexcept
 };
 
 // send response
-void SocketEngine::send_response(int client_fd, std::string_view response) const noexcept
+void SocketEngine::send_response(socket_t client_fd, std::string_view response) const noexcept
 {
+#if NOMOS_IS_WINDOWS
+  send(client_fd, response.data(), static_cast<int>(response.size()), 0);
+#else
   write(client_fd, response.data(), response.size());
-};
-
-// close socket
-void SocketEngine::close_connection(int fd) noexcept
-{
-  close(fd);
+#endif
 }
 
+// close socket
+void SocketEngine::close_connection(socket_t fd) noexcept
+{
+  if (fd != consts::INVALID_SOCKET)
+  {
+#if NOMOS_IS_WINDOWS
+    closesocket(fd);
+#else
+    close(fd);
+#endif
+  }
+}
 }; // namespace nomos::internal

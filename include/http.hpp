@@ -1,4 +1,6 @@
 #pragma once
+
+#include "types.hpp"
 #include <optional>
 #include <string_view>
 
@@ -15,17 +17,15 @@ struct Request
 class Response
 {
 private:
-  int m_client_fd;
+  nomos::types::socket_t m_client_fd;
 
 public:
-  explicit Response(int client_fd) noexcept : m_client_fd(client_fd)
+  explicit Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd)
   {
   }
 
   void send(std::string_view response) const noexcept;
 };
-
-constexpr const char *HTTP_END = "\r\n";
 
 class HttpParser
 {

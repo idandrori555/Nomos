@@ -1,5 +1,7 @@
-#include "http.hpp"
-#include "socket.hpp"
+#include "../include/http.hpp"
+#include "../include/const.hpp"
+#include "../include/socket.hpp"
+#include <format>
 
 namespace nomos::http
 {
@@ -8,7 +10,7 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   if (raw_http.empty())
     return std::nullopt;
 
-  size_t line_end = raw_http.find(HTTP_END);
+  size_t line_end = raw_http.find(consts::HTTP_END);
   if (line_end == std::string_view::npos)
     return std::nullopt;
 
@@ -40,13 +42,13 @@ void Response::send(std::string_view body) const noexcept
 {
   internal::SocketEngine engine;
 
-  std::string full_response =
+  std::string full_response = std::format(
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/plain\r\n"
-      "Content-Length: " +
-      std::to_string(body.size()) + "\r\n"
-                                    "Connection: close\r\n\r\n" +
-      std::string(body);
+      "Content-Length: {}\r\n"
+      "Connection: close\r\n\r\n"
+      "{}",
+      body.size(), body);
 
   engine.send_response(m_client_fd, full_response);
 };

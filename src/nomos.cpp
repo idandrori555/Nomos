@@ -1,7 +1,7 @@
-#include "nomos.hpp"
-#include "http.hpp"
-#include "socket.hpp"
-#include <print>
+#include "../include/nomos.hpp"
+#include "../include/const.hpp"
+#include "../include/http.hpp"
+#include "../include/socket.hpp"
 
 namespace nomos
 {
@@ -18,8 +18,8 @@ void App::listen(port_t port, NomosListenCallback callback)
 
   while (true)
   {
-    int client_fd = engine.accept_connection();
-    if (client_fd < 0)
+    socket_t client_fd = engine.accept_connection();
+    if (client_fd == consts::INVALID_SOCKET)
       continue;
 
     std::string raw_request = engine.read_request(client_fd);
@@ -61,15 +61,15 @@ void App::add_route(std::string_view method, std::string_view path, NomosHandler
 
 void App::get(std::string_view path, NomosHandler handler)
 {
-  add_route("GET", path, std::move(handler));
+  add_route(consts::HTTP_METHOD_GET, path, std::move(handler));
 }
 void App::post(std::string_view path, NomosHandler handler)
 {
-  add_route("POST", path, std::move(handler));
+  add_route(consts::HTTP_METHOD_POST, path, std::move(handler));
 }
 void App::all(std::string_view path, NomosHandler handler)
 {
-  add_route("ALL", path, std::move(handler));
+  add_route(consts::HTTP_METHOD_ALL, path, std::move(handler));
 }
 
 }; // namespace nomos

@@ -1,19 +1,15 @@
 #pragma once
 
-#include "http.hpp"
-#include <functional>
+#include "types.hpp"
 #include <map>
 #include <string_view>
-#include <vector>
 
 namespace nomos
 {
-typedef unsigned short port_t;
-typedef std::function<void(port_t)> NomosListenCallback;
-typedef std::function<void(const http::Request &, const http::Response &)> NomosHandler;
-
+using namespace nomos::types;
 class App
 {
+
 public:
   App(void) noexcept = default;
   ~App(void) = default;
