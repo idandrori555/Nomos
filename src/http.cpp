@@ -40,8 +40,6 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
 
 void Response::send(std::string_view body) const noexcept
 {
-  internal::SocketEngine engine;
-
   std::string full_response = std::format(
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/plain\r\n"
@@ -50,6 +48,6 @@ void Response::send(std::string_view body) const noexcept
       "{}",
       body.size(), body);
 
-  engine.send_response(m_client_fd, full_response);
+  internal::SocketEngine::send_response(m_client_fd, full_response);
 };
 }; // namespace nomos::http
