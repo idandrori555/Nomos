@@ -1,0 +1,33 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install Modern Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++-13
+        
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -DCMAKE_CXX_COMPILER=g++-13 \
+          -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    - name: Run Unit Tests
+      working-directory: build
+      run: ctest --output-on-failure

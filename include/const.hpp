@@ -10,6 +10,7 @@ constexpr const char *HTTP_METHOD_POST = "POST";
 constexpr const char *HTTP_METHOD_ALL = "ALL";
 
 constexpr int MAX_CHUNK_SIZE = 4096;
+constexpr int MAX_THREADS = 10;
 
 constexpr const types::socket_t INVALID_SOCKET = -1;
 } // namespace nomos::consts

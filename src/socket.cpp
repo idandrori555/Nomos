@@ -56,7 +56,7 @@ socket_t SocketEngine::accept_connection(void) noexcept
 };
 
 // read request
-std::string SocketEngine::read_request(socket_t client_fd) const noexcept
+std::string SocketEngine::read_request(socket_t client_fd)
 {
   std::array<char, consts::MAX_CHUNK_SIZE> buffer{};
 #if NOMOS_IS_WINDOWS
@@ -71,7 +71,7 @@ std::string SocketEngine::read_request(socket_t client_fd) const noexcept
 };
 
 // send response
-void SocketEngine::send_response(socket_t client_fd, std::string_view response) const noexcept
+void SocketEngine::send_response(socket_t client_fd, std::string_view response)
 {
 #if NOMOS_IS_WINDOWS
   send(client_fd, response.data(), static_cast<int>(response.size()), 0);
@@ -81,7 +81,7 @@ void SocketEngine::send_response(socket_t client_fd, std::string_view response) 
 }
 
 // close socket
-void SocketEngine::close_connection(socket_t fd) noexcept
+void SocketEngine::close_connection(socket_t fd)
 {
   if (fd != consts::INVALID_SOCKET)
   {

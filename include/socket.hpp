@@ -27,13 +27,13 @@ struct SocketEngine
   socket_t accept_connection(void) noexcept;
 
   // read request
-  std::string read_request(socket_t client_fd) const noexcept;
+  static std::string read_request(socket_t client_fd);
 
   // send response
-  void send_response(socket_t client_fd, std::string_view response) const noexcept;
+  static void send_response(socket_t client_fd, std::string_view response);
 
   // close socket
-  void close_connection(socket_t fd) noexcept;
+  static void close_connection(socket_t fd);
 };
 
 }; // namespace nomos::internal

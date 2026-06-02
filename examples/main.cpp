@@ -1,6 +1,6 @@
 #include "../include/http.hpp"
 #include "../include/nomos.hpp"
-#include <print>
+#include <iostream>
 
 int main(void)
 {
@@ -13,7 +13,7 @@ int main(void)
 
   app.listen(1234, [](auto port)
              {
-               std::println("Listening on port {}", port);
+               std::cout << "Listening on port " << port << std::endl;
              });
 
   return 0;

@@ -19,8 +19,8 @@ using socket_t = int;
 using socket_t = SOCKET;
 #endif
 
-typedef unsigned short port_t;
-typedef std::function<void(port_t)> NomosListenCallback;
-typedef std::function<void(const http::Request &, const http::Response &)> NomosHandler;
+using port_t = unsigned short;
+using NomosListenCallback = std::function<void(port_t)>;
+using NomosHandler = std::function<void(const http::Request &, const http::Response &)>;
 
 } // namespace nomos::types
