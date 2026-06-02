@@ -35,20 +35,21 @@ void App::listen(port_t port, NomosListenCallback callback)
 
                               if (m_routes.contains(specific_key))
                               {
-                                for (const auto &handler : m_routes[specific_key])
+                                for (const auto &handler : m_routes.at(specific_key))
                                 {
                                   handler(*req, res);
                                 }
                               }
                               else if (m_routes.contains(generic_key))
                               {
-                                for (const auto &handler : m_routes[generic_key])
+                                for (const auto &handler : m_routes.at(generic_key))
                                 {
                                   handler(*req, res);
                                 }
                               }
                               else
                               {
+                                // default unspecified route behavior
                                 res.send("Not Found!");
                               }
                             }
