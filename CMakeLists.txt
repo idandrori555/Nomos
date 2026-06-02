@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 project(nomos VERSION 0.1.0 LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # <--- This is important for clangd
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -10,6 +12,7 @@ add_library(nomos
     src/nomos.cpp
     src/http.cpp
     src/socket.cpp
+    src/thread_pool.cpp
 )
 
 target_include_directories(nomos PUBLIC 

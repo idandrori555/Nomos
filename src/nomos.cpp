@@ -22,37 +22,41 @@ void App::listen(port_t port, NomosListenCallback callback)
     if (client_fd == consts::INVALID_SOCKET)
       continue;
 
-    std::string raw_request = engine.read_request(client_fd);
-    http::Response res{client_fd};
+    // Hand off the connection descriptor directly to the pre-allocated thread pool
+    m_thread_pool.enqueue([this, client_fd]()
+                          {
+                            std::string raw_request = internal::SocketEngine::read_request(client_fd);
+                            http::Response res{client_fd};
 
-    if (auto req = http::HttpParser::parse(raw_request); req.has_value())
-    {
-      std::string specific_key = std::string(req->method) + " " + std::string(req->path);
-      std::string generic_key = "ALL " + std::string(req->path);
+                            if (auto req = http::HttpParser::parse(raw_request); req.has_value())
+                            {
+                              std::string specific_key = std::string(req->method) + " " + std::string(req->path);
+                              std::string generic_key = "ALL " + std::string(req->path);
 
-      if (m_routes.contains(specific_key)) // Check if there is a specific route for this request. (GET, POST, etc...)
-      {
-        for (const auto &handler : m_routes[specific_key]) // Go over all middleware functions and call them with request and response objects.
-        {
-          handler(*req, res);
-        }
-      }
-      else if (m_routes.contains(generic_key)) // Check if there is a generic route for this request. (ALL)
-      {
-        for (const auto &handler : m_routes[generic_key]) // Go over all middleware functions and call them with request and response objects.
-        {
-          handler(*req, res);
-        }
-      }
-      else
-      {
-        res.send("Not Found!");
-      };
-    }
-
-    engine.close_connection(client_fd);
+                              if (m_routes.contains(specific_key))
+                              {
+                                for (const auto &handler : m_routes[specific_key])
+                                {
+                                  handler(*req, res);
+                                }
+                              }
+                              else if (m_routes.contains(generic_key))
+                              {
+                                for (const auto &handler : m_routes[generic_key])
+                                {
+                                  handler(*req, res);
+                                }
+                              }
+                              else
+                              {
+                                res.send("Not Found!");
+                              }
+                            }
+                            internal::SocketEngine::close_connection(client_fd);
+                          });
   }
 }
+
 void App::add_route(std::string_view method, std::string_view path, NomosHandler handler)
 {
   std::string key = std::string(method) + " " + std::string(path);
