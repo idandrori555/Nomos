@@ -4,11 +4,13 @@
 
 int main(void)
 {
+  using namespace nomos;
+
   nomos::App app;
 
-  app.get("/", [](const auto &req, nomos::http::Response &res)
+  app.get("/", [](const auto &req, http::Response &res)
           {
-            res.status(500).body("Hello World!").send();
+            res.status(200).body("Hello World!").send();
           });
 
   app.listen(1234, [](auto port)
