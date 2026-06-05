@@ -6,9 +6,9 @@ int main(void)
 {
   nomos::App app;
 
-  app.get("/", [](const auto &req, const auto &res)
+  app.get("/", [](const auto &req, nomos::http::Response &res)
           {
-            res.send("Hello World!");
+            res.status(500).body("Hello World!").send();
           });
 
   app.listen(1234, [](auto port)
