@@ -44,6 +44,14 @@ public:
     m_headers.emplace_back("Connection", "close");
   }
 
+  ~Response() noexcept = default;
+
+  constexpr inline bool is_committed() const noexcept
+  {
+    // TODO: implement this...
+    return false;
+  };
+
   Response &status(types::status_t status) noexcept;
   Response &headers(const Headers &headers) noexcept;
   Response &header(const std::string &key, const std::string &value) noexcept;

@@ -2,14 +2,15 @@
 
 #include "types.hpp"
 #include <array>
+#include <string>
 #include <string_view>
 
 namespace nomos::consts
 {
-constexpr const char *HTTP_END = "\r\n";
-constexpr const char *HTTP_METHOD_GET = "GET";
-constexpr const char *HTTP_METHOD_POST = "POST";
-constexpr const char *HTTP_METHOD_ALL = "ALL";
+constexpr std::string HTTP_END = "\r\n";
+constexpr std::string HTTP_METHOD_GET = "GET";
+constexpr std::string HTTP_METHOD_POST = "POST";
+constexpr std::string HTTP_METHOD_ALL = "ALL";
 
 constexpr types::status_t HTTP_STATUS_OK = 200;
 constexpr types::status_t HTTP_STATUS_BAD_REQUEST = 400;

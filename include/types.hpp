@@ -22,6 +22,7 @@ using socket_t = SOCKET;
 using port_t = unsigned short;
 using NomosListenCallback = std::function<void(port_t)>;
 using NomosHandler = std::function<void(const http::Request &, http::Response &)>;
+using NomosMiddleware = std::function<void(http::Request &, http::Response &)>;
 using status_t = unsigned short;
 
 } // namespace nomos::types
