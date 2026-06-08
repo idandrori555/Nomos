@@ -1,6 +1,6 @@
 #include "../include/socket.hpp"
 
-#if NOMOS_IS_WINDOWS == 1
+#ifdef NOMOS_IS_WINDOWS
 #include <winsock2.h>
 #else
 #include <netinet/in.h>
@@ -15,7 +15,7 @@ namespace nomos::internal
 // init bind and listen
 std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
 {
-#if NOMOS_IS_WINDOWS == 1
+#ifdef NOMOS_IS_WINDOWS
   WSADATA wsa_data;
   if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
   {
@@ -47,7 +47,7 @@ std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
 socket_t SocketEngine::accept_connection(void) noexcept
 {
   sockaddr_in client_addr{};
-#if NOMOS_IS_WINDOWS
+#ifdef NOMOS_IS_WINDOWS
   int client_addr_len = sizeof(client_addr);
 #else
   socklen_t client_addr_len = sizeof(client_addr);
@@ -59,7 +59,7 @@ socket_t SocketEngine::accept_connection(void) noexcept
 std::string SocketEngine::read_request(socket_t client_fd)
 {
   std::array<char, consts::MAX_CHUNK_SIZE> buffer{};
-#if NOMOS_IS_WINDOWS
+#ifdef NOMOS_IS_WINDOWS
   long bytes_read = recv(client_fd, buffer.data(), static_cast<int>(buffer.size() - 1), 0);
 #else
   long bytes_read = read(client_fd, buffer.data(), buffer.size() - 1);
@@ -73,7 +73,7 @@ std::string SocketEngine::read_request(socket_t client_fd)
 // send response
 void SocketEngine::send_response(socket_t client_fd, std::string_view response)
 {
-#if NOMOS_IS_WINDOWS
+#ifdef NOMOS_IS_WINDOWS
   send(client_fd, response.data(), static_cast<int>(response.size()), 0);
 #else
   write(client_fd, response.data(), response.size());
@@ -85,7 +85,7 @@ void SocketEngine::close_connection(socket_t fd)
 {
   if (fd != consts::INVALID_SOCKET)
   {
-#if NOMOS_IS_WINDOWS
+#ifdef NOMOS_IS_WINDOWS
     closesocket(fd);
 #else
     close(fd);

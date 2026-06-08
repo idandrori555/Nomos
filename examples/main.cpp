@@ -1,14 +1,22 @@
 #include "../include/http.hpp"
 #include "../include/nomos.hpp"
 #include <iostream>
+#include <print>
 
 int main(void)
 {
+  using namespace nomos;
+
   nomos::App app;
 
-  app.get("/", [](const auto &req, const auto &res)
+  app.use([](...)
           {
-            res.send("Hello World!");
+            std::println("New Request Detected!");
+          });
+
+  app.get("/", [](const auto &, http::Response &res)
+          {
+            res.status(200).body("Hello World!").header("X-hello-world", "HELLO!!!!").send();
           });
 
   app.listen(1234, [](auto port)
