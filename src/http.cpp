@@ -1,7 +1,6 @@
 #include "../include/http.hpp"
 #include "../include/const.hpp"
 #include "../include/socket.hpp"
-#include <algorithm>
 #include <format>
 
 namespace nomos::http
@@ -72,11 +71,6 @@ std::string Response::get_status_line(types::status_t status) noexcept
   }
 }
 
-bool Response::is_valid_header(std::string_view header) noexcept
-{
-  return std::ranges::contains(consts::HTTP_HEADERS, header);
-}
-
 Response &Response::status(types::status_t status) noexcept
 {
   m_status = status;
@@ -86,22 +80,13 @@ Response &Response::status(types::status_t status) noexcept
 Response &Response::headers(const Headers &headers) noexcept
 {
   for (const auto &header : headers)
-  {
-    if (!is_valid_header(header.key))
-    {
-    }
-    continue;
-
     m_headers.push_back(header);
-  }
+
   return *this;
 }
 
 Response &Response::header(const std::string &key, const std::string &value) noexcept
 {
-  if (!is_valid_header(key))
-    return *this;
-
   m_headers.push_back({.key = key, .value = value});
   return *this;
 }

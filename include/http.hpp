@@ -34,7 +34,6 @@ private:
 
   static std::string get_status_line(types::status_t status) noexcept;
   static std::string get_headers_str(const Headers &headers) noexcept;
-  static bool is_valid_header(std::string_view header) noexcept;
 
 public:
   Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)

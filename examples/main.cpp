@@ -9,16 +9,14 @@ int main(void)
 
   nomos::App app;
 
-  auto middlewareLogger = [](...)
-  {
-    std::println("REQUEST DETECTED!");
-  };
-
-  app.use(middlewareLogger);
-
-  app.get("/", [](const auto &req, http::Response &res)
+  app.use([](...)
           {
-            res.status(200).body("Hello World!").send();
+            std::println("New Request Detected!");
+          });
+
+  app.get("/", [](const auto &, http::Response &res)
+          {
+            res.status(200).body("Hello World!").header("X-hello-world", "HELLO!!!!").send();
           });
 
   app.listen(1234, [](auto port)
