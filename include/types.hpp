@@ -10,13 +10,18 @@ class Response;
 
 namespace nomos::types
 {
+
 #ifdef __linux__
-#define NOMOS_IS_WINDOWS 0
-using socket_t = int;
+#undef NOMOS_IS_WINDOWS
 #elif defined(__WIN32) || defined(_WIN64)
+#define NOMOS_IS_WINDOWS
 #include <winsock2.h>
-#define NOMOS_IS_WINDOWS 1
+#endif
+
+#ifdef NOMOS_IS_WINDOWS
 using socket_t = SOCKET;
+#else
+using socket_t = int;
 #endif
 
 using port_t = unsigned short;
