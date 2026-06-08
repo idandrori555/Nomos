@@ -31,12 +31,13 @@ private:
   types::status_t m_status;
   std::string m_body;
   Headers m_headers;
+  bool m_committed;
 
   static std::string get_status_line(types::status_t status) noexcept;
   static std::string get_headers_str(const Headers &headers) noexcept;
 
 public:
-  Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
+  Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK), m_committed(false)
   {
     m_headers.emplace_back("Server", "Nomos");
     m_headers.emplace_back("Content-Type", "text/html");
@@ -44,12 +45,6 @@ public:
   }
 
   ~Response() noexcept = default;
-
-  constexpr inline bool is_committed() const noexcept
-  {
-    // TODO: implement this...
-    return false;
-  };
 
   Response &status(types::status_t status) noexcept;
   Response &headers(const Headers &headers) noexcept;

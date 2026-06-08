@@ -33,31 +33,29 @@ void App::listen(port_t port, NomosListenCallback callback)
                               // Execute ALL middlewares first!
                               execute_all_middleware(*req, res);
 
-                              if (!res.is_committed())
-                              {
-                                std::string specific_key = std::format("{} {}", req->method, req->path);
-                                std::string generic_key = std::format("ALL {}", req->path);
+                              std::string specific_key = std::format("{} {}", req->method, req->path);
+                              std::string generic_key = std::format("ALL {}", req->path);
 
-                                if (m_routes.contains(specific_key))
+                              if (m_routes.contains(specific_key))
+                              {
+                                for (const auto &handler : m_routes.at(specific_key))
                                 {
-                                  for (const auto &handler : m_routes.at(specific_key))
-                                  {
-                                    handler(*req, res);
-                                  }
-                                }
-                                else if (m_routes.contains(generic_key))
-                                {
-                                  for (const auto &handler : m_routes.at(generic_key))
-                                  {
-                                    handler(*req, res);
-                                  }
-                                }
-                                else
-                                {
-                                  res.send("Not Found!");
+                                  handler(*req, res);
                                 }
                               }
+                              else if (m_routes.contains(generic_key))
+                              {
+                                for (const auto &handler : m_routes.at(generic_key))
+                                {
+                                  handler(*req, res);
+                                }
+                              }
+                              else
+                              {
+                                res.send("Not Found!");
+                              }
                             }
+
                             internal::SocketEngine::close_connection(client_fd);
                           });
   }
@@ -77,9 +75,6 @@ void App::execute_all_middleware(http::Request &req, http::Response &res)
   for (const auto &middleware : m_middleware)
   {
     middleware(req, res);
-
-    if (res.is_committed())
-      break;
   }
 }
 
