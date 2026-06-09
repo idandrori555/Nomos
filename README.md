@@ -1,76 +1,106 @@
-# Nomos
+# Nomos 🚀
 
-A lightweight C++ HTTP server framework with a thread pool, simple routing, and cross platform socket support.
+**Express-like simplicity. Bare-metal C++ speed.**
 
-Built for learning and experimenting with low level networking, concurrency, and minimal web frameworks.
+Nomos is an ultra-lightweight, high-performance web framework for C++23. It strips away the heavy boilerplate and complex enterprise architectures of traditional C++ servers, giving you a clean, expressive API that feels like modern JavaScript or Go, backed by the raw speed of native code.
 
----
-
-## Features
-
-- Simple HTTP server with routing system
-- Thread pool for handling concurrent connections
-- Cross platform socket abstraction (Windows + Linux)
-- Basic HTTP request parser
-- Handler based routing (GET, POST, ALL)
-- Clean separation between networking, HTTP, and application layers
+No complex configurations. No massive dependencies. Just fast, elegant APIs.
 
 ---
 
-## Architecture Overview
+## Why Nomos?
 
-The project is split into 4 main parts:
+### ✨ Expressive Routing
+Write clean, readable route handlers without wading through endless configuration templates.
 
-### 1. Socket Layer
-Handles raw TCP networking:
-- Create server socket
-- Bind and listen on port
-- Accept client connections
-- Read and write raw data
-- Cross platform support via preprocessor checks
+### 🔌 Plug-and-Play Middleware
+Chain logging, authentication, and request handling flows sequentially with zero fuss.
 
-### 2. HTTP Layer
-Parses and responds to HTTP requests:
-- Simple request line parser (method, path, version)
-- Minimal response builder
-- Sends HTTP/1.1 responses over socket
+### 📁 Instant Static File Serving
+Serve HTML, CSS, and assets directly to your users with a single, elegant command.
 
-### 3. Thread Pool
-Manages concurrency:
-- Pre-allocated worker threads
-- Task queue protected by mutex
-- Condition variable for wakeups
-- Stop token support for clean shutdown
-
-### 4. App Layer
-User facing API:
-- Route registration (GET, POST, ALL)
-- Request dispatching
-- Thread pool integration
-- Handler execution per request
+### ⚡ No Bloat, No Dependencies
+Standard, pure C++ compilation that runs seamlessly on both Linux and Windows.
 
 ---
 
-## Example Usage
+## 🧑‍💻 The Developer Experience
+
+Writing backend APIs in C++ shouldn't feel like writing assembly. Nomos makes it incredibly clean:
 
 ```cpp
-#include "../include/nomos.hpp"
-#include "../include/http.hpp"
+#include "nomos.hpp"
+#include "http.hpp"
 #include <iostream>
 
 int main()
 {
-  nomos::App app;
+    nomos::App app;
 
-  app.get("/", [](const auto& req, const auto& res)
-  {
-    res.send("Hello World!");
-  });
+    // Simple logging middleware
+    app.use([](auto &req, auto &res) {
+        std::cout << "[" << req.method << "] " << req.path << std::endl;
+    });
 
-  app.listen(1234, [](auto port)
-  {
-    std::cout << "Listening on port " << port << std::endl;
-  });
+    // Clean, fluent routing
+    app.get("/", [](const auto &req, nomos::http::Response &res) {
+        res.status(200)
+           .header("X-Framework", "Nomos")
+           .body("Hello from C++23!")
+           .send();
+    });
 
-  return 0;
+    // Serve static assets natively
+    app.get("/dashboard", [](const auto &req, nomos::http::Response &res) {
+        res.file("public/index.html").send();
+    });
+
+    // Start listening on port 1234
+    app.listen(1234, [](auto port) {
+        std::cout << "🚀 Nomos server online at http://localhost:" << port << std::endl;
+    });
+
+    return 0;
 }
+```
+
+---
+
+## 🚀 Features At A Glance
+
+- **Ergonomic API** — Built with an intuitive, developer-first routing design.
+- **Unified Cross-Platform Core** — Transparent support for Linux and Windows networking out of the box.
+- **Embedded Thread Pool** — Handles multiple concurrent users automatically in the background.
+- **Zero-Dependency Setup** — Standard CMake build with no external libraries required.
+
+---
+
+## ⚡ Quickstart
+
+Getting up and running takes less than a minute.
+
+### 1. Build the Server
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/nomos.git
+cd nomos
+
+# Configure and compile
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+### 2. Run the Example
+
+```bash
+./build/nomos_example
+```
+
+Open `http://localhost:1234` in your browser and you're live!
+
+---
+
+## 📄 License
+
+Nomos is open-source software licensed under the MIT License.

@@ -1,31 +1,39 @@
-#include "../include/http.hpp"
-#include "../include/nomos.hpp"
+#include "http.hpp"
+#include "nomos.hpp"
 #include <iostream>
 
-int main(void)
+int main()
 {
   using namespace nomos;
 
-  nomos::App app;
+  App app;
 
-  app.use([](auto &&...)
+  // Simple logging middleware
+  app.use([](const auto &req, auto &)
           {
-            std::cout << "New Request Detected!" << std::endl;
+            std::cout << "[" << req.method << "] " << req.path << std::endl;
           });
 
-  app.get("/", [](const auto &, http::Response &res)
+  // Clean, fluent routing
+  app.get("/", [](const auto &, nomos::http::Response &res)
           {
-            res.status(200).body("Hello World!").header("X-hello-world", "HELLO!!!!").send();
+            res.status(200)
+                .header("X-Framework", "Nomos")
+                .body("Hello from C++23!")
+                .send();
           });
 
-  app.get("/file", [](const auto &, http::Response &res)
+  // Serve static assets natively
+  app.get("/dashboard", [](const auto &, nomos::http::Response &res)
           {
             res.file("public/index.html").send();
           });
 
+  // Start listening on port 1234
   app.listen(1234, [](auto port)
              {
-               std::cout << "Listening on port " << port << std::endl;
+               std::cout << "🚀 Nomos server online at http://localhost:" << port
+                         << std::endl;
              });
 
   return 0;
