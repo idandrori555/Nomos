@@ -26,6 +26,17 @@ std::expected<void, SocketError> SocketEngine::listen(port_t port) noexcept
   if (server_fd == consts::INVALID_SOCKET)
     return std::unexpected(SocketError::CreateFailed);
 
+  int opt = 1;
+#ifdef NOMOS_IS_WINDOWS
+  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&opt), sizeof(opt)) < 0)
+#else
+  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+#endif
+  {
+    close_connection(server_fd);
+    return std::unexpected(SocketError::BindFailed); // Or create a specific error type
+  }
+
   sockaddr_in addr{};
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY;

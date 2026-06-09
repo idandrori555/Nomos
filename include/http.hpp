@@ -2,6 +2,7 @@
 
 #include "const.hpp"
 #include "types.hpp"
+#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -16,25 +17,18 @@ struct Request
   // TODO: add body, headers, etc..
 };
 
-struct Header
-{
-  std::string key;
-  std::string value;
-};
-
-using Headers = std::vector<Header>;
-
 class Response
 {
 private:
   types::socket_t m_client_fd;
   types::status_t m_status;
   std::string m_body;
-  Headers m_headers;
+  types::Headers m_headers;
   bool m_committed;
+  std::mutex m_file_mutex;
 
   static std::string get_status_line(types::status_t status) noexcept;
-  static std::string get_headers_str(const Headers &headers) noexcept;
+  static std::string get_headers_str(const types::Headers &headers) noexcept;
 
 public:
   Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK), m_committed(false)
@@ -47,9 +41,11 @@ public:
   ~Response() noexcept = default;
 
   Response &status(types::status_t status) noexcept;
-  Response &headers(const Headers &headers) noexcept;
+  Response &headers(const types::Headers &headers) noexcept;
   Response &header(const std::string &key, const std::string &value) noexcept;
   Response &body(std::string_view body) noexcept;
+  Response &file(const char *file_path) noexcept;
+  Response &file(const std::string &file_path) noexcept;
   void send(std::string_view response = "") const noexcept;
 };
 

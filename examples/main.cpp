@@ -1,7 +1,6 @@
 #include "../include/http.hpp"
 #include "../include/nomos.hpp"
 #include <iostream>
-#include <print>
 
 int main(void)
 {
@@ -9,14 +8,19 @@ int main(void)
 
   nomos::App app;
 
-  app.use([](...)
+  app.use([](auto &&...)
           {
-            std::println("New Request Detected!");
+            std::cout << "New Request Detected!" << std::endl;
           });
 
   app.get("/", [](const auto &, http::Response &res)
           {
             res.status(200).body("Hello World!").header("X-hello-world", "HELLO!!!!").send();
+          });
+
+  app.get("/file", [](const auto &, http::Response &res)
+          {
+            res.file("public/index.html").send();
           });
 
   app.listen(1234, [](auto port)
