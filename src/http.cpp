@@ -94,9 +94,9 @@ Response &Response::header(const std::string &key, const std::string &value) noe
   return *this;
 }
 
-Response &Response::body(std::string_view body) noexcept
+Response &Response::body(std::string body) noexcept
 {
-  m_body = body;
+  m_body = std::move(body);
   return *this;
 }
 
