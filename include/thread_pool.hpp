@@ -13,7 +13,7 @@ class ThreadPool
 {
 public:
   ThreadPool(size_t num_threads = std::thread::hardware_concurrency());
-  ~ThreadPool() = default; // becuase we use jthreads, we don't need to manually join.
+  ~ThreadPool();
 
   void enqueue(std::function<void()> task);
 

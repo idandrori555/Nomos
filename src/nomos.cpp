@@ -52,7 +52,7 @@ void App::listen(port_t port, NomosListenCallback callback)
                               }
                               else
                               {
-                                res.send("Not Found!");
+                                res.status(consts::HTTP_STATUS_NOT_FOUND).send("Not Found!");
                               }
                             }
 

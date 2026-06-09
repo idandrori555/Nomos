@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 namespace nomos::http
 {
@@ -24,10 +25,20 @@ using socket_t = SOCKET;
 using socket_t = int;
 #endif
 
+/// === Types ===
+struct Header
+{
+  std::string key;
+  std::string value;
+};
+
+using Headers = std::vector<Header>;
+using status_t = unsigned short;
 using port_t = unsigned short;
+
+// === Function Types ===
 using NomosListenCallback = std::function<void(port_t)>;
 using NomosHandler = std::function<void(const http::Request &, http::Response &)>;
 using NomosMiddleware = std::function<void(http::Request &, http::Response &)>;
-using status_t = unsigned short;
 
 } // namespace nomos::types

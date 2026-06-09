@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <future>
+#include <vector>
 
 TEST_CASE("ThreadPool - Basic Functionality", "[thread_pool]")
 {
@@ -19,7 +20,6 @@ TEST_CASE("ThreadPool - Basic Functionality", "[thread_pool]")
                    promise.set_value(42);
                  });
 
-    // Block until the worker thread executes the task
     REQUIRE(future.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
     CHECK(future.get() == 42);
   }
@@ -48,7 +48,6 @@ TEST_CASE("ThreadPool - Basic Functionality", "[thread_pool]")
                    });
     }
 
-    // Wait for all asynchronous tasks to complete
     for (auto &fut : futures)
     {
       REQUIRE(fut.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
@@ -65,19 +64,24 @@ TEST_CASE("ThreadPool - Edge Cases and Destructor Lifecycle", "[thread_pool]")
   SECTION("Pool cleans up properly with outstanding tasks on destruction")
   {
     std::atomic<int> completed_tasks{0};
+    std::atomic<bool> block_threads{true};
+
     {
       ThreadPool pool(2);
 
-      // Push some long-running tasks to jam the workers
+      // Jam the active worker threads completely
       for (int i = 0; i < 2; ++i)
       {
-        pool.enqueue([]()
+        pool.enqueue([&block_threads]()
                      {
-                       std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                       while (block_threads.load(std::memory_order_relaxed))
+                       {
+                         std::this_thread::yield();
+                       }
                      });
       }
 
-      // Enqueue additional queued jobs that haven't been picked up yet
+      // Enqueue extra tasks that will sit in the queue unpicked
       for (int i = 0; i < 5; ++i)
       {
         pool.enqueue([&completed_tasks]()
@@ -86,11 +90,12 @@ TEST_CASE("ThreadPool - Edge Cases and Destructor Lifecycle", "[thread_pool]")
                      });
       }
 
-      // Leaving scope triggers ~ThreadPool() immediately.
-      // The workers will drain the existing running ones and check m_stop.
+      // Allow the active threads to exit their loops so they can see the stop flag
+      block_threads.store(false);
+
+      // Leaving this scope triggers ~ThreadPool() immediately.
     }
 
-    // Verify the code cleanly stops without causing any hang or deadlock.
-    SUCCEED("Destructor resolved cleanly.");
+    SUCCEED("Destructor resolved cleanly without deadlocking.");
   }
 }

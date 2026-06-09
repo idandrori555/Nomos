@@ -2,6 +2,9 @@
 #include "../include/const.hpp"
 #include "../include/socket.hpp"
 #include <format>
+#include <fstream>
+#include <iostream>
+#include <mutex>
 
 namespace nomos::http
 {
@@ -38,7 +41,7 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   return Request{.method = method, .path = path, .version = version};
 }
 
-std::string Response::get_headers_str(const Headers &headers) noexcept
+std::string Response::get_headers_str(const types::Headers &headers) noexcept
 {
   std::string result;
 
@@ -77,7 +80,7 @@ Response &Response::status(types::status_t status) noexcept
   return *this;
 }
 
-Response &Response::headers(const Headers &headers) noexcept
+Response &Response::headers(const types::Headers &headers) noexcept
 {
   for (const auto &header : headers)
     m_headers.push_back(header);
@@ -91,10 +94,31 @@ Response &Response::header(const std::string &key, const std::string &value) noe
   return *this;
 }
 
-Response &Response::body(std::string_view body) noexcept
+Response &Response::body(std::string body) noexcept
 {
-  m_body = body;
+  m_body = std::move(body);
   return *this;
+}
+
+Response &Response::file(const char *file_path) noexcept
+{
+  std::lock_guard lock(m_file_mutex);
+  std::ifstream file{file_path};
+
+  if (!file.is_open() || !file.good())
+  {
+    std::cerr << "Error opening file: " << file_path << std::endl;
+    return *this;
+  }
+
+  m_body = std::string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+
+  return *this;
+}
+
+Response &Response::file(const std::string &file_path) noexcept
+{
+  return file(file_path.c_str());
 }
 
 void Response::send(std::string_view response) const noexcept

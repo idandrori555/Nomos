@@ -15,26 +15,38 @@ ThreadPool::ThreadPool(size_t num_threads)
                                std::function<void()> task;
                                {
                                  std::unique_lock lock{m_mutex};
-                                 m_cv.wait(lock, [this, stop_token] // Wait untill there is a task
-                                           {
+                                 m_cv.wait(lock, [this, &stop_token]
+                                           { // Capture token by reference
                                              return m_stop || !m_tasks.empty() || stop_token.stop_requested();
                                            });
 
-                                 if (m_stop && m_tasks.empty())
+                                 if ((m_stop || stop_token.stop_requested()) && m_tasks.empty())
                                    return;
 
                                  if (m_tasks.empty())
                                    continue;
 
-                                 // grab the task from the queue
                                  task = std::move(m_tasks.front());
                                  m_tasks.pop();
                                }
 
-                               task(); // execute the task
+                               if (task)
+                               {
+                                 task();
+                               }
                              }
                            });
   }
+}
+
+ThreadPool::~ThreadPool()
+{
+  {
+    std::unique_lock lock{m_mutex};
+    m_stop = true;
+  }
+
+  m_cv.notify_all();
 }
 
 void ThreadPool::enqueue(std::function<void()> task)

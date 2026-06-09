@@ -18,5 +18,6 @@ constexpr types::status_t HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
 constexpr int MAX_CHUNK_SIZE = 4096;
 constexpr int MAX_THREADS = 10;
 
+constexpr const types::port_t INVALID_PORT = 0;
 constexpr const types::socket_t INVALID_SOCKET = -1;
 } // namespace nomos::consts

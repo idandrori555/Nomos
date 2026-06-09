@@ -41,8 +41,10 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(nomos_tests
     tests/test_http.cpp
+    tests/test_thread_pool.cpp
 )
 
 target_link_libraries(nomos_tests PRIVATE nomos Catch2::Catch2WithMain)
 
 add_test(NAME HttpTests COMMAND nomos_tests)
+add_test(NAME ThreadPoolTests COMMAND nomos_tests)
