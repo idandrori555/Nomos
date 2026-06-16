@@ -2,7 +2,6 @@
 
 #include "const.hpp"
 #include "types.hpp"
-#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -30,9 +29,9 @@ private:
 public:
   Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
   {
-    m_headers.emplace_back("Server", "Nomos");
-    m_headers.emplace_back("Content-Type", "text/html");
-    m_headers.emplace_back("Connection", "close");
+    m_headers.push_back({"Server", "Nomos"});
+    m_headers.push_back({"Content-Type", "text/html"});
+    m_headers.push_back({"Connection", "close"});
   }
 
   ~Response() noexcept = default;
