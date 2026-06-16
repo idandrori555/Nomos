@@ -45,9 +45,7 @@ std::string Response::get_headers_str(const types::Headers &headers) noexcept
   std::string result;
 
   for (const auto &header : headers)
-  {
     result += std::format("{}: {}\r\n", header.key, header.value);
-  }
 
   return result;
 }
