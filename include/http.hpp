@@ -11,10 +11,9 @@ namespace nomos::http
 {
 struct Request
 {
-  std::string_view method;
-  std::string_view path;
-  std::string_view version;
-  // TODO: add body, headers, etc..
+  std::string method;
+  std::string path;
+  std::string version;
 };
 
 class Response
@@ -24,14 +23,12 @@ private:
   types::status_t m_status;
   std::string m_body;
   types::Headers m_headers;
-  bool m_committed;
-  std::mutex m_file_mutex;
 
   static std::string get_status_line(types::status_t status) noexcept;
   static std::string get_headers_str(const types::Headers &headers) noexcept;
 
 public:
-  Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK), m_committed(false)
+  Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
   {
     m_headers.emplace_back("Server", "Nomos");
     m_headers.emplace_back("Content-Type", "text/html");
