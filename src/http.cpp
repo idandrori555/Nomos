@@ -4,7 +4,6 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <mutex>
 
 namespace nomos::http
 {
@@ -38,7 +37,7 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   if (path.empty() || method.empty() || version.empty())
     return std::nullopt;
 
-  return Request{.method = method, .path = path, .version = version};
+  return Request{std::string(method), std::string(path), std::string(version)};
 }
 
 std::string Response::get_headers_str(const types::Headers &headers) noexcept
@@ -102,7 +101,6 @@ Response &Response::body(std::string body) noexcept
 
 Response &Response::file(const char *file_path) noexcept
 {
-  std::lock_guard lock(m_file_mutex);
   std::ifstream file{file_path};
 
   if (!file.is_open() || !file.good())
