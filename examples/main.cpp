@@ -5,17 +5,18 @@
 int main()
 {
   using namespace nomos;
+  using namespace nomos::http;
 
   App app;
 
   // Simple logging middleware
-  app.use([](const auto &req, auto &)
+  app.use([](const Request &req, auto &)
           {
             std::cout << "[" << req.method << "] " << req.path << std::endl;
           });
 
   // Clean, fluent routing
-  app.get("/", [](const auto &, nomos::http::Response &res)
+  app.get("/", [](const auto &, Response &res)
           {
             res.status(200)
                 .header("X-Framework", "Nomos")
@@ -24,7 +25,7 @@ int main()
           });
 
   // Serve static assets natively
-  app.get("/dashboard", [](const auto &, nomos::http::Response &res)
+  app.get("/dashboard", [](const auto &, Response &res)
           {
             res.file("public/index.html").send();
           });

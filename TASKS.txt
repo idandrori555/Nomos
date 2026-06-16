@@ -1,0 +1,4 @@
+✅
+
+* Start working on the Request's API (Get headers, cookies, etc)
+* implement dynamic routes ("users/:id") and get those variables in compile time!
