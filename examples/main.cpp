@@ -11,9 +11,15 @@ int main()
   App app;
 
   // Simple logging middleware
-  app.use([](const Request &req, auto &, auto)
+  app.use([](const Request &req, auto &, auto next)
           {
             std::cout << "[" << req.method << "] " << req.path << std::endl;
+            next();
+          });
+
+  app.use([](auto &, auto &, auto)
+          {
+            std::cout << "HI\n";
           });
 
   app.get("/", [](const auto &, Response &res)
