@@ -39,6 +39,7 @@ using port_t = unsigned short;
 // === Function Types ===
 using NomosListenCallback = std::function<void(port_t)>;
 using NomosHandler = std::function<void(const http::Request &, http::Response &)>;
-using NomosMiddleware = std::function<void(http::Request &, http::Response &)>;
+using NomosNextFunction = std::function<void(void)>;
+using NomosMiddleware = std::function<void(http::Request &, http::Response &, NomosNextFunction)>;
 
 } // namespace nomos::types

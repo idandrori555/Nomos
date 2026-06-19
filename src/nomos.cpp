@@ -78,8 +78,20 @@ void App::add_route(std::string_view method, std::string_view path, NomosHandler
 
 void App::execute_all_middleware(http::Request &req, http::Response &res)
 {
-  for (const auto &middleware : m_middleware)
-    middleware(req, res);
+  if (m_middleware.empty())
+    return;
+
+  size_t index{0};
+  NomosNextFunction next = [&]()
+  {
+    if (index < m_middleware.size())
+    {
+      auto &current_middleware = m_middleware[index++];
+      current_middleware(req, res, next);
+    }
+  };
+
+  next(); // Start the chain
 }
 
 void App::use(NomosMiddleware handler)
