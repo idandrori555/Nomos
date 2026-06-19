@@ -1,10 +1,9 @@
-#include "../include/http.hpp"
-#include "../include/const.hpp"
-#include "../include/socket.hpp"
+#include "http.hpp"
+#include "const.hpp"
+#include "socket.hpp"
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <mutex>
 
 namespace nomos::http
 {
@@ -38,7 +37,15 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   if (path.empty() || method.empty() || version.empty())
     return std::nullopt;
 
-  return Request{.method = method, .path = path, .version = version};
+  return Request{std::string(method), std::string(path), std::string(version)};
+}
+
+Response::Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
+{
+  // Default headers
+  m_headers.push_back({"Server", "Nomos"});
+  m_headers.push_back({"Content-Type", "text/html"});
+  m_headers.push_back({"Connection", "close"});
 }
 
 std::string Response::get_headers_str(const types::Headers &headers) noexcept
@@ -46,9 +53,7 @@ std::string Response::get_headers_str(const types::Headers &headers) noexcept
   std::string result;
 
   for (const auto &header : headers)
-  {
     result += std::format("{}: {}\r\n", header.key, header.value);
-  }
 
   return result;
 }
@@ -102,7 +107,6 @@ Response &Response::body(std::string body) noexcept
 
 Response &Response::file(const char *file_path) noexcept
 {
-  std::lock_guard lock(m_file_mutex);
   std::ifstream file{file_path};
 
   if (!file.is_open() || !file.good())
