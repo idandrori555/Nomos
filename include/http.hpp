@@ -1,6 +1,5 @@
 #pragma once
 
-#include "const.hpp"
 #include "types.hpp"
 #include <optional>
 #include <string>
@@ -27,13 +26,7 @@ private:
   static std::string get_headers_str(const types::Headers &headers) noexcept;
 
 public:
-  Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
-  {
-    m_headers.push_back({"Server", "Nomos"});
-    m_headers.push_back({"Content-Type", "text/html"});
-    m_headers.push_back({"Connection", "close"});
-  }
-
+  Response(types::socket_t client_fd) noexcept;
   ~Response() noexcept = default;
 
   Response &status(types::status_t status) noexcept;

@@ -1,6 +1,6 @@
-#include "../include/http.hpp"
-#include "../include/const.hpp"
-#include "../include/socket.hpp"
+#include "http.hpp"
+#include "const.hpp"
+#include "socket.hpp"
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -38,6 +38,14 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
     return std::nullopt;
 
   return Request{std::string(method), std::string(path), std::string(version)};
+}
+
+Response::Response(types::socket_t client_fd) noexcept : m_client_fd(client_fd), m_status(consts::HTTP_STATUS_OK)
+{
+  // Default headers
+  m_headers.push_back({"Server", "Nomos"});
+  m_headers.push_back({"Content-Type", "text/html"});
+  m_headers.push_back({"Connection", "close"});
 }
 
 std::string Response::get_headers_str(const types::Headers &headers) noexcept
