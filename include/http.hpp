@@ -33,8 +33,7 @@ public:
   Response &headers(const types::Headers &headers) noexcept;
   Response &header(const std::string &key, const std::string &value) noexcept;
   Response &body(std::string body) noexcept;
-  Response &file(const char *file_path) noexcept;
-  Response &file(const std::string &file_path) noexcept;
+  Response &file(std::string_view file_path) noexcept;
   void send(std::string_view response = "") const noexcept;
 };
 

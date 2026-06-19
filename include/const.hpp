@@ -20,4 +20,8 @@ constexpr int MAX_THREADS = 10;
 
 constexpr const types::port_t INVALID_PORT = 0;
 constexpr const types::socket_t INVALID_SOCKET = -1;
+
+auto constexpr NomosEmptyLambda = [](void)
+{
+};
 } // namespace nomos::consts

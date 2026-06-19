@@ -1,5 +1,6 @@
 #include "http.hpp"
 #include "nomos.hpp"
+#include "types.hpp"
 #include <iostream>
 
 int main()
@@ -10,16 +11,16 @@ int main()
   App app;
 
   // Simple logging middleware
-  app.use([](const Request &req, auto &)
+  app.use([](const Request &req, auto &, auto)
           {
             std::cout << "[" << req.method << "] " << req.path << std::endl;
           });
 
-  // Clean, fluent routing
   app.get("/", [](const auto &, Response &res)
           {
             res.status(200)
                 .header("X-Framework", "Nomos")
+                .header("X-Version", "0.1.0")
                 .body("Hello from C++23!")
                 .send();
           });

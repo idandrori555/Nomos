@@ -105,9 +105,9 @@ Response &Response::body(std::string body) noexcept
   return *this;
 }
 
-Response &Response::file(const char *file_path) noexcept
+Response &Response::file(std::string_view file_path) noexcept
 {
-  std::ifstream file{file_path};
+  std::ifstream file{file_path.data()};
 
   if (!file.is_open() || !file.good())
   {
@@ -116,13 +116,7 @@ Response &Response::file(const char *file_path) noexcept
   }
 
   m_body = std::string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-
   return *this;
-}
-
-Response &Response::file(const std::string &file_path) noexcept
-{
-  return file(file_path.c_str());
 }
 
 void Response::send(std::string_view response) const noexcept
