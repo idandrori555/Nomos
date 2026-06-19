@@ -17,11 +17,6 @@ int main()
             next();
           });
 
-  app.use([](auto &, auto &, auto)
-          {
-            std::cout << "HI\n";
-          });
-
   app.get("/", [](const auto &, Response &res)
           {
             res.status(200)

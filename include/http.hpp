@@ -24,6 +24,7 @@ private:
 
   static std::string get_status_line(types::status_t status) noexcept;
   static std::string get_headers_str(const types::Headers &headers) noexcept;
+  static std::string_view get_content_type(std::string_view file_path) noexcept;
 
 public:
   Response(types::socket_t client_fd) noexcept;

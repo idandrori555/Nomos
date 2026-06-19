@@ -79,6 +79,22 @@ std::string Response::get_status_line(types::status_t status) noexcept
   }
 }
 
+std::string_view Response::get_content_type(std::string_view file_path) noexcept
+{
+  constexpr std::string_view DEFAULT_CONTENT_TYPE = "text/html";
+
+  if (file_path.ends_with(".css"))
+    return "text/css";
+
+  else if (file_path.ends_with(".js"))
+    return "application/javascript";
+
+  else if (file_path.ends_with(".html"))
+    return "text/html";
+  else
+    return DEFAULT_CONTENT_TYPE;
+}
+
 Response &Response::status(types::status_t status) noexcept
 {
   m_status = status;
@@ -95,7 +111,20 @@ Response &Response::headers(const types::Headers &headers) noexcept
 
 Response &Response::header(const std::string &key, const std::string &value) noexcept
 {
-  m_headers.push_back({.key = key, .value = value});
+  if (key.empty() || value.empty())
+    return *this;
+
+  for (auto &header : m_headers)
+  {
+    if (header.key == key)
+    {
+      // Update existing header
+      header.value = value;
+      return *this;
+    }
+  }
+
+  m_headers.push_back({key, value});
   return *this;
 }
 
@@ -107,8 +136,10 @@ Response &Response::body(std::string body) noexcept
 
 Response &Response::file(std::string_view file_path) noexcept
 {
-  std::ifstream file{file_path.data()};
+  // Set correct content type
+  header("Content-Type", std::string{get_content_type(file_path)});
 
+  std::ifstream file{file_path.data()};
   if (!file.is_open() || !file.good())
   {
     std::cerr << "Error opening file: " << file_path << std::endl;
