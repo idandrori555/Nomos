@@ -57,11 +57,13 @@ Headers HttpParser::parse_headers(std::string_view header_section) noexcept
     {
       std::string_view key = line.substr(0, colon);
       std::string_view value = trim_leading_spaces(line.substr(colon + 1));
+
       headers.push_back({std::string(key), std::string(value)});
     }
 
     if (next_line == std::string_view::npos)
       break;
+
     pos = next_line + 2;
   }
 
