@@ -33,10 +33,20 @@ int main()
           });
 
   // Serve static assets natively
-  app.get("/dashboard", [](const auto &, Response &res)
+  app.get("/html", [](const auto &, Response &res)
           {
             res.file("public/index.html").send();
           });
+
+  app.all("/api", [](const auto &, Response &res)
+          {
+            res.status(200).body("ALL HIT!").send();
+          });
+
+  app.post("/api", [](const auto &, Response &res)
+           {
+             res.status(200).body("POST HIT!").send();
+           });
 
   // Start listening on port 1234
   app.listen(1234, [](auto port)
