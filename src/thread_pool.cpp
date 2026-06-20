@@ -1,4 +1,4 @@
-#include "../include/thread_pool.hpp"
+#include "thread_pool.hpp"
 #include <stop_token>
 
 namespace nomos::internal
@@ -39,7 +39,7 @@ ThreadPool::ThreadPool(size_t num_threads)
   }
 }
 
-ThreadPool::~ThreadPool()
+ThreadPool::~ThreadPool() noexcept
 {
   {
     std::unique_lock lock{m_mutex};

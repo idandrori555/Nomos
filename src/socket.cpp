@@ -1,4 +1,4 @@
-#include "../include/socket.hpp"
+#include "socket.hpp"
 
 #ifdef NOMOS_IS_WINDOWS
 #include <winsock2.h>

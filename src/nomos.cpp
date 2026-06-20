@@ -1,7 +1,6 @@
-#include "../include/nomos.hpp"
-#include "../include/const.hpp"
-#include "../include/http.hpp"
-#include "../include/socket.hpp"
+#include "nomos.hpp"
+#include "http.hpp"
+#include "socket.hpp"
 #include "types.hpp"
 
 namespace nomos
