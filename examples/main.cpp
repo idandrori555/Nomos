@@ -17,6 +17,12 @@ int main()
             next();
           });
 
+  app.use([](const auto &, auto &, auto next)
+          {
+            std::cout << "Second Middlware" << std::endl;
+            next();
+          });
+
   app.get("/", [](const auto &, Response &res)
           {
             res.status(200)

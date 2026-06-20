@@ -80,17 +80,21 @@ void App::execute_all_middleware(http::Request &req, http::Response &res)
   if (m_middleware.empty())
     return;
 
-  size_t index{0};
-  NomosNextFunction next = [&]()
+  auto dispatch = [&](auto &self, size_t idx) -> void
   {
-    if (index < m_middleware.size())
+    if (idx >= m_middleware.size())
+      return;
+
+    auto &current_middleware = m_middleware[idx];
+    auto next = [idx, &self]()
     {
-      auto &current_middleware = m_middleware[index++];
-      current_middleware(req, res, next);
-    }
+      self(self, idx + 1);
+    };
+
+    current_middleware(req, res, next);
   };
 
-  next(); // Start the chain
+  dispatch(dispatch, 0);
 }
 
 void App::use(NomosMiddleware handler)
