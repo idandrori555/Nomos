@@ -30,7 +30,6 @@ private:
 
   std::vector<NomosMiddleware> m_middleware;
   std::unordered_map<METHOD, std::unordered_map<PATH, std::vector<NomosHandler>>> m_routes;
-  port_t m_port{consts::INVALID_PORT};
   internal::ThreadPool m_thread_pool{consts::MAX_THREADS};
 
   void add_route(std::string_view method, std::string_view path, NomosHandler handler);

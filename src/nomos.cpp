@@ -13,8 +13,6 @@ void App::listen(port_t port, NomosListenCallback callback)
   if (!listen_result.has_value())
     return;
 
-  this->m_port = port;
-
   if (callback)
     callback(port);
 
