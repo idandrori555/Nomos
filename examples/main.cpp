@@ -38,8 +38,9 @@ int main()
             res.file("public/index.html").send();
           });
 
-  app.all("/api", [](const auto &, Response &res)
+  app.all("/api", [](const Request &req, Response &res)
           {
+            std::cout << "Body: " << req.body << std::endl;
             res.status(200).body("ALL HIT!").send();
           });
 
