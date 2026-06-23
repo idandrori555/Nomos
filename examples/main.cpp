@@ -19,7 +19,7 @@ int main()
 
   app.use([](const auto &, auto &, auto next)
           {
-            std::cout << "Second Middlware" << std::endl;
+            std::cout << "Second Middleware" << std::endl;
             next();
           });
 

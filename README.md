@@ -1,5 +1,10 @@
 # Nomos 🚀
 
+[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue)](https://en.cppreference.com/w/cpp/23)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Linux Build](https://img.shields.io/badge/Linux-passing-brightgreen)](https://github.com/idandrori555/Nomos/actions)
+[![Windows Build](https://img.shields.io/badge/Windows-passing-brightgreen)](https://github.com/idandrori555/Nomos/actions)
+
 **Express-like simplicity. Bare-metal C++ speed.**
 
 Nomos is an ultra-lightweight, high-performance web framework for C++23. It strips away the heavy boilerplate and complex enterprise architectures of traditional C++ servers, giving you a clean, expressive API that feels like modern JavaScript or Go, backed by the raw speed of native code.
@@ -24,7 +29,7 @@ Standard, pure C++ compilation that runs seamlessly on both Linux and Windows.
 
 ---
 
-## 🧑‍💻 The Developer Experience
+## The Developer Experience
 
 Writing backend APIs in C++ shouldn't feel like writing assembly. Nomos makes it incredibly clean:
 
@@ -38,12 +43,13 @@ int main()
     nomos::App app;
 
     // Simple logging middleware
-    app.use([](auto &req, auto &res) {
+    app.use([](auto &req, auto &res, auto next) {
         std::cout << "[" << req.method << "] " << req.path << std::endl;
+        next();
     });
 
     // Clean, fluent routing
-    app.get("/", [](const auto &req, nomos::http::Response &res) {
+    app.get("/", [](const auto &req, nomos::http::Response &res, auto next) {
         res.status(200)
            .header("X-Framework", "Nomos")
            .body("Hello from C++23!")
@@ -51,13 +57,13 @@ int main()
     });
 
     // Serve static assets natively
-    app.get("/dashboard", [](const auto &req, nomos::http::Response &res) {
+    app.get("/dashboard", [](const auto &req, nomos::http::Response &res, auto next) {
         res.file("public/index.html").send();
     });
 
     // Start listening on port 1234
     app.listen(1234, [](auto port) {
-        std::cout << "🚀 Nomos server online at http://localhost:" << port << std::endl;
+        std::cout << "Nomos server online at http://localhost:" << port << std::endl;
     });
 
     return 0;
@@ -66,29 +72,46 @@ int main()
 
 ---
 
-## 🚀 Features At A Glance
+## Features
 
-- **Ergonomic API** — Built with an intuitive, developer-first routing design.
-- **Unified Cross-Platform Core** — Transparent support for Linux and Windows networking out of the box.
-- **Embedded Thread Pool** — Handles multiple concurrent users automatically in the background.
-- **Zero-Dependency Setup** — Standard CMake build with no external libraries required.
+| Feature | Status |
+|---------|--------|
+| Routing (`GET`, `POST`, `ALL`) | ✅ |
+| Middleware pipeline | ✅ |
+| Static file serving | ✅ |
+| Thread pool (automatic concurrency) | ✅ |
+| Cross-platform (Linux + Windows) | ✅ |
+| Fluent response builder | ✅ |
+| Route parameters (`/users/:id`) | 🔜 Planned |
+| Request header / cookie / query accessors | 🔜 Planned |
+| JSON body parsing | ❌ Not yet |
+| HTTPS / TLS | ❌ Not yet |
 
 ---
 
-## ⚡ Quickstart
+## Requirements
 
-Getting up and running takes less than a minute.
+- **Compiler:** GCC 14+, Clang 18+, or MSVC 2022+ (C++23 support required)
+- **CMake:** 3.25+
+- **No external runtime dependencies** (Catch2 is fetched automatically for tests)
 
-### 1. Build the Server
+---
+
+## Quickstart
+
+### 1. Build
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/nomos.git
-cd nomos
+git clone https://github.com/idandrori555/Nomos.git
+cd Nomos
 
-# Configure and compile
+# Release build
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
+
+# Debug build (for development)
+cmake -B build_debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build_debug
 ```
 
 ### 2. Run the Example
@@ -99,8 +122,68 @@ cmake --build build
 
 Open `http://localhost:1234` in your browser and you're live!
 
+### 3. Run the Tests
+
+```bash
+cmake --build build
+./build/nomos_tests
+
+# Or via CTest
+ctest --test-dir build
+```
+
 ---
 
-## 📄 License
+## API Overview
 
-Nomos is open-source software licensed under the MIT License.
+### `App`
+
+| Method | Description |
+|--------|-------------|
+| `get(path, handler)` | Register a GET route |
+| `post(path, handler)` | Register a POST route |
+| `all(path, handler)` | Register a catch-all method route |
+| `use(middleware)` | Add a middleware function |
+| `listen(port, callback)` | Start the server |
+
+### `Response`
+
+Fluent builder returned from handlers:
+
+```cpp
+res.status(200)
+   .header("X-Custom", "value")
+   .body("Hello")
+   .send();
+```
+
+### `Request`
+
+Data object with fields: `method`, `path`, `version`, `body`, `headers`.
+
+---
+
+## Contributing
+
+Contributions are welcome! See [TASKS.txt](TASKS.txt) for open items.
+
+- **Code style:** C++23, no exceptions, match existing patterns
+- **PRs:** Keep changes focused; include tests where possible
+- **Issues:** Please check existing issues before opening a new one
+
+---
+
+## Roadmap
+
+- [ ] Route parameters (`/users/:id`)
+- [ ] Request header / cookie / query string accessors
+- [ ] JSON body parsing
+- [ ] Chunked transfer encoding & keep-alive
+- [ ] HTTPS support
+- [ ] CI pipeline (GitHub Actions)
+
+---
+
+## License
+
+Nomos is open-source software licensed under the [MIT License](LICENSE).

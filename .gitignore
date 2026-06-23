@@ -17,5 +17,6 @@
 
 # CMake build outputs
 /build/
+/build_win/
 /build_debug/
 CMakeUserPresets.json
