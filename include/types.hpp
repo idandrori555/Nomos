@@ -12,7 +12,7 @@
 
 namespace nomos::http
 {
-struct Request;
+class Request;
 class Response;
 }; // namespace nomos::http
 
