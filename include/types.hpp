@@ -1,5 +1,12 @@
 #pragma once
 
+#ifdef __linux__
+#undef NOMOS_IS_WINDOWS
+#elif defined(__WIN32) || defined(_WIN64)
+#define NOMOS_IS_WINDOWS
+#include <winsock2.h>
+#endif
+
 #include <functional>
 #include <string>
 
@@ -11,13 +18,6 @@ class Response;
 
 namespace nomos::types
 {
-
-#ifdef __linux__
-#undef NOMOS_IS_WINDOWS
-#elif defined(__WIN32) || defined(_WIN64)
-#define NOMOS_IS_WINDOWS
-#include <winsock2.h>
-#endif
 
 #ifdef NOMOS_IS_WINDOWS
 using socket_t = SOCKET;

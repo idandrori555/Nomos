@@ -19,6 +19,10 @@ constexpr int MAX_CHUNK_SIZE = 4096;
 constexpr int MAX_THREADS = 10;
 
 constexpr const types::port_t INVALID_PORT = 0;
+
+#ifdef INVALID_SOCKET
+#undef INVALID_SOCKET
+#endif
 constexpr const types::socket_t INVALID_SOCKET = -1;
 
 auto constexpr NomosEmptyLambda = [](void)
