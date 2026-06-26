@@ -1,4 +1,4 @@
-#include "../include/socket.hpp"
+#include "socket.hpp"
 
 #ifdef NOMOS_IS_WINDOWS
 #include <winsock2.h>
@@ -84,11 +84,19 @@ std::string SocketEngine::read_request(socket_t client_fd)
 // send response
 void SocketEngine::send_response(socket_t client_fd, std::string_view response)
 {
+  size_t total_sent = 0;
+  while (total_sent < response.size())
+  {
 #ifdef NOMOS_IS_WINDOWS
-  send(client_fd, response.data(), static_cast<int>(response.size()), 0);
+    int sent = send(client_fd, response.data() + total_sent, static_cast<int>(response.size() - total_sent), 0);
 #else
-  write(client_fd, response.data(), response.size());
+    ssize_t sent = write(client_fd, response.data() + total_sent, response.size() - total_sent);
 #endif
+    if (sent <= 0)
+      break; // Handle connection closed or error
+
+    total_sent += sent;
+  }
 }
 
 // close socket

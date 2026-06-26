@@ -1,7 +1,6 @@
-#include "../include/nomos.hpp"
-#include "../include/const.hpp"
-#include "../include/http.hpp"
-#include "../include/socket.hpp"
+#include "nomos.hpp"
+#include "http.hpp"
+#include "socket.hpp"
 #include "types.hpp"
 
 namespace nomos
@@ -9,10 +8,10 @@ namespace nomos
 void App::listen(port_t port, NomosListenCallback callback)
 {
   internal::SocketEngine engine;
-  if (!engine.listen(port))
-    return;
 
-  this->m_port = port;
+  auto listen_result = engine.listen(port);
+  if (!listen_result.has_value())
+    return;
 
   if (callback)
     callback(port);
@@ -30,30 +29,38 @@ void App::listen(port_t port, NomosListenCallback callback)
 
                             if (auto req = http::HttpParser::parse(raw_request); req.has_value())
                             {
-                              // Execute ALL middlewares first!
                               execute_all_middleware(*req, res);
 
-                              std::string specific_key = std::format("{} {}", req->method, req->path);
-                              std::string generic_key = std::format("ALL {}", req->path);
+                              bool route_found = false;
 
-                              if (m_routes.contains(specific_key))
+                              // Try matching the specific HTTP method first
+                              if (auto method_it = m_routes.find(req->method); method_it != m_routes.end())
                               {
-                                for (const auto &handler : m_routes.at(specific_key))
+                                if (auto path_it = method_it->second.find(req->path); path_it != method_it->second.end())
                                 {
-                                  handler(*req, res);
+                                  for (const auto &handler : path_it->second)
+                                    handler(*req, res);
+
+                                  route_found = true;
                                 }
                               }
-                              else if (m_routes.contains(generic_key))
+
+                              // Fall back to universal "ALL" routes if no specific method matched
+                              if (!route_found)
                               {
-                                for (const auto &handler : m_routes.at(generic_key))
-                                {
-                                  handler(*req, res);
-                                }
+                                if (auto all_it = m_routes.find(std::string(consts::HTTP_METHOD_ALL)); all_it != m_routes.end())
+                                  if (auto path_it = all_it->second.find(req->path); path_it != all_it->second.end())
+                                  {
+                                    for (const auto &handler : path_it->second)
+                                      handler(*req, res);
+
+                                    route_found = true;
+                                  }
                               }
-                              else
-                              {
+
+                              // Send 404 if no path profiles matched
+                              if (!route_found)
                                 res.status(consts::HTTP_STATUS_NOT_FOUND).send("Not Found!");
-                              }
                             }
 
                             internal::SocketEngine::close_connection(client_fd);
@@ -63,19 +70,29 @@ void App::listen(port_t port, NomosListenCallback callback)
 
 void App::add_route(std::string_view method, std::string_view path, NomosHandler handler)
 {
-  std::string key;
-  key.reserve(method.size() + 1 + path.size());
-  key.append(method).append(" ").append(path);
-
-  m_routes[key].push_back(std::move(handler));
+  m_routes[std::string(method)][std::string(path)].push_back(std::move(handler));
 }
 
 void App::execute_all_middleware(http::Request &req, http::Response &res)
 {
-  for (const auto &middleware : m_middleware)
+  if (m_middleware.empty())
+    return;
+
+  auto dispatch = [&](auto &self, size_t idx) -> void
   {
-    middleware(req, res);
-  }
+    if (idx >= m_middleware.size())
+      return;
+
+    auto &current_middleware = m_middleware[idx];
+    auto next = [idx, &self]()
+    {
+      self(self, idx + 1);
+    };
+
+    current_middleware(req, res, next);
+  };
+
+  dispatch(dispatch, 0);
 }
 
 void App::use(NomosMiddleware handler)

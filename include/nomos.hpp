@@ -3,8 +3,8 @@
 #include "const.hpp"
 #include "thread_pool.hpp"
 #include "types.hpp"
-#include <map>
 #include <string_view>
+#include <unordered_map>
 
 namespace nomos
 {
@@ -25,9 +25,11 @@ public:
   void all(std::string_view path, NomosHandler);
 
 private:
+  using METHOD = std::string;
+  using PATH = std::string;
+
   std::vector<NomosMiddleware> m_middleware;
-  std::map<std::string, std::vector<NomosHandler>> m_routes;
-  port_t m_port{consts::INVALID_PORT};
+  std::unordered_map<METHOD, std::unordered_map<PATH, std::vector<NomosHandler>>> m_routes;
   internal::ThreadPool m_thread_pool{consts::MAX_THREADS};
 
   void add_route(std::string_view method, std::string_view path, NomosHandler handler);

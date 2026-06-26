@@ -19,6 +19,11 @@ target_include_directories(nomos PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+# --- WINDOWS WINSOCK CONFIGURATION ---
+if(WIN32)
+    target_link_libraries(nomos PUBLIC ws2_32)
+endif()
+
 add_executable(nomos_example 
     examples/main.cpp
 )
