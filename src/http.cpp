@@ -195,6 +195,12 @@ Response &Response::body(std::string body) noexcept
 
 Response &Response::file(std::string_view file_path) noexcept
 {
+  if (file_path.empty())
+    return *this;
+
+  if (file_path.contains(".."))
+    return *this;
+
   // Set correct content type
   header("Content-Type", std::string{get_content_type(file_path)});
 
