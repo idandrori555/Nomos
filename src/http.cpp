@@ -75,25 +75,25 @@ std::optional<Request> HttpParser::parse(std::string_view raw_http) noexcept
   if (raw_http.empty())
     return std::nullopt;
 
-  // Split headers and body
-  size_t header_end = raw_http.find("\r\n\r\n");
-  std::string_view header_section = (header_end == std::string_view::npos) ? raw_http : raw_http.substr(0, header_end);
-  std::string_view body = (header_end == std::string_view::npos) ? "" : raw_http.substr(header_end + 4);
-
-  // Extract the first line
-  size_t first_line_end = header_section.find("\r\n");
+  size_t first_line_end = raw_http.find("\r\n");
   if (first_line_end == std::string_view::npos)
     return std::nullopt;
 
-  std::string_view start_line = header_section.substr(0, first_line_end);
+  std::string_view start_line = raw_http.substr(0, first_line_end);
 
-  // Parse components
   std::string_view method, path, version;
   if (!parse_start_line(start_line, method, path, version))
     return std::nullopt;
 
-  // Parse the remaining headers
-  std::string_view remaining_headers = header_section.substr(first_line_end + 2);
+  size_t header_end = raw_http.find("\r\n\r\n");
+  std::string_view header_section = (header_end == std::string_view::npos) ? raw_http : raw_http.substr(0, header_end);
+  std::string_view body = (header_end == std::string_view::npos) ? "" : raw_http.substr(header_end + 4);
+
+  std::string_view remaining_headers = "";
+  if (header_end != std::string_view::npos && (first_line_end + 2) < header_end)
+  {
+    remaining_headers = header_section.substr(first_line_end + 2);
+  }
   Headers headers = parse_headers(remaining_headers);
 
   return Request{std::string(method), std::string(path), std::string(version), std::string(body), headers};
