@@ -198,7 +198,7 @@ Response &Response::file(std::string_view file_path) noexcept
   // Set correct content type
   header("Content-Type", std::string{get_content_type(file_path)});
 
-  std::ifstream file{file_path.data()};
+  std::ifstream file{std::string(file_path)};
   if (!file.is_open() || !file.good())
   {
     std::cerr << "Error opening file: " << file_path << std::endl;
